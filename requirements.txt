@@ -1,3 +1,17 @@
-streamlit>=1.30
-mdtraj>=1.9.9
-numpy>=1.23
+# Required dependencies for the Streamlit app
+streamlit==1.51.0
+pandas==2.3.2
+scikit-learn==1.7.2
+matplotlib==3.10.0
+openpyxl==3.1.5
+plotly==6.3.1
+kaleido==1.1.0
+seaborn==0.13.2
+
+# Scientific libraries used by the application
+numpy>=1.22
+mdtraj>=1.11.1
+
+# Note: MDtraj 1.11.1 requires Python 3.11 or newerhttps://pypi.org/project/mdtraj/#:~:text=.  Streamlit
+# supports Python 3.10–3.14https://docs.streamlit.io/knowledge-base/using-streamlit/sanity-checks#:~:text=Check%20,supported%20version%20of%20Python, so running this
+# application under Python 3.11 or 3.12 is recommended.

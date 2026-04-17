@@ -1,39 +1,3 @@
-
-# Required dependencies for the Streamlit app
-# Core web interface and data science stack
-#
-# Pin Streamlit to a recent release that supports Python 3.14 and uses
-# a pyarrow dependency compatible with this interpreter.  Streamlit 1.56.0
-# (released 2026‑03‑31) is the latest version at the time of writing and
-# removes the pyarrow <22 upper bound that caused incompatibility with
-# Python 3.14.  See related GitHub discussions about Streamlit 1.51.0
-# depending on pyarrow<22 for more context.
 streamlit>=1.56.0
-
-# Use a pandas version with Python 3.14 wheels.  Pandas 3.0.2 is compatible
-# with Python ≥3.11 and has pre‑built wheels for Python 3.14https://pypi.org/project/pandas/#:~:text=,all.
-pandas==3.0.2
-
-scikit-learn==1.7.2
-matplotlib==3.10.0
-openpyxl==3.1.5
-plotly==6.3.1
-kaleido==1.1.0
-seaborn==0.13.2
-
-# Scientific libraries used by the application
 numpy>=1.22
 mdtraj>=1.11.1
-
-# Do not pin pyarrow explicitly.  Newer Streamlit versions will pull a
-# compatible pyarrow automatically when required.  Explicitly pinning
-# pyarrow==23.0.1 conflicted with Streamlit 1.51.0’s dependency range
-# (pyarrow>=7,<22) and caused installation failure on Python 3.14.  By
-# omitting pyarrow here, pip will select an appropriate version that
-# satisfies Streamlit’s requirement and has pre‑built wheels for the
-# target Python version.
-
-# MDtraj 1.11.1 requires Python 3.11 or newerhttps://pypi.org/project/mdtraj/#:~:text=.  Streamlit 1.56.0
-# supports Python 3.10–3.14https://docs.streamlit.io/knowledge-base/using-streamlit/sanity-checks#:~:text=Check%20,supported%20version%20of%20Python, so running this application under
-# Python 3.11 or 3.12 is recommended.
-

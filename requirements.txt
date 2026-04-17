@@ -8,4 +8,3 @@ kaleido==1.1.0
 seaborn==0.13.2
 numpy>=1.22
 mdtraj>=1.11.1
-pyarrow==23.0.1

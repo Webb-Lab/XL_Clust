@@ -187,18 +187,76 @@ def select_representative(traj: md.Trajectory) -> md.Trajectory:
     return traj[idx]
 
 
-def trajectory_to_pdb_bytes(traj: md.Trajectory) -> bytes:
-    """Write a trajectory to a temporary PDB file and return its bytes."""
+def trajectory_to_pdb_bytes(traj: md.Trajectory, renumber: bool = True) -> bytes:
+    """
+    Write a trajectory to a temporary PDB file and return its bytes.
+
+    If ``renumber`` is True, the model indices and residue numbers are
+    adjusted to start from 1 (PyMOL has trouble opening files with
+    zero‑based model or residue numbering).  ``mdtraj.save_pdb``
+    produces MODEL records starting at 0 and retains the original residue
+    numbering from the input topology; here we rewrite those fields so
+    MODEL starts at 1 and residue numbers are incremented by 1.
+
+    Parameters
+    ----------
+    traj : md.Trajectory
+        The trajectory to save.
+    renumber : bool, default True
+        Whether to adjust model and residue numbering for better
+        compatibility with downstream tools (e.g., PyMOL).
+
+    Returns
+    -------
+    bytes
+        The PDB contents as a byte string.
+    """
     fd, path = tempfile.mkstemp(suffix=".pdb")
     os.close(fd)
     try:
         traj.save_pdb(path)
-        with open(path, "rb") as fh:
-            data = fh.read()
+        with open(path, "r") as fh:
+            lines = fh.readlines()
+        if renumber:
+            model_count = 0
+            new_lines: list[str] = []
+            for line in lines:
+                if line.startswith("MODEL"):
+                    # increment model index and write with right‑justified width 4
+                    model_count += 1
+                    new_lines.append(f"MODEL{model_count:>4d}\n")
+                    continue
+                if line.startswith(("ATOM", "HETATM")):
+                    # residue number is columns 23–26 (1‑indexed). Add 1.
+                    res_str = line[22:26]
+                    try:
+                        res_num = int(res_str)
+                        new_res = res_num + 1
+                        line = line[:22] + f"{new_res:4d}" + line[26:]
+                    except ValueError:
+                        pass
+                    new_lines.append(line)
+                    continue
+                if line.startswith("TER"):
+                    # residue number also appears in TER lines
+                    res_str = line[22:26]
+                    try:
+                        res_num = int(res_str)
+                        new_res = res_num + 1
+                        line = line[:22] + f"{new_res:4d}" + line[26:]
+                    except ValueError:
+                        pass
+                    new_lines.append(line)
+                    continue
+                new_lines.append(line)
+            data = "".join(new_lines).encode()
+        else:
+            with open(path, "rb") as fh:
+                data = fh.read()
     finally:
-        os.remove(path)
+        if os.path.exists(path):
+            os.remove(path)
     return data
-
 
 def main() -> None:
     st.set_page_config(page_title="Trajectory Distance Filter and Clustering", layout="wide")
